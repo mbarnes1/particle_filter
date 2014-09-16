@@ -3,7 +3,6 @@ __author__ = 'mbarnes1'
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import sys
 
 
 class Map(object):
@@ -25,8 +24,8 @@ class Map(object):
         self._resolution = 10  # 10cm resolution
         self._occupancy_vector = self._occupancy_grid.ravel()
         self._normalized_occupancy_vector = self._occupancy_vector/sum(self._occupancy_vector)
-        #self.max_x = self._occupancy_grid.size[0]*self._resolution
-        #self.max_y = self._occupancy_grid.size[1]*self._resolution
+        self._max_x = self._occupancy_grid.shape[0]*self._resolution
+        self._max_y = self._occupancy_grid.shape[1]*self._resolution
 
     def query(self, x, y):
         """
@@ -43,14 +42,14 @@ class Map(object):
         :return:
         x, y
         """
-        print np.version.version
-        print sys.path
         vector_index = np.random.choice(range(0, len(self._occupancy_vector)), p=self._normalized_occupancy_vector,
                                         replace=True)
-        array_index = np.unravel_index(vector_index, self._occupancy_grid.size())
+        array_index = np.unravel_index(vector_index, self._occupancy_grid.shape)
         return array_index[0], array_index[1]
 
     def display(self, particles):
         plt.imshow(self._occupancy_grid, cmap=cm.Greys_r)
         for particle in particles:
-            plt.plot(particle.x, particle.y)
+            plt.plot(particle.y, particle.x, 'r.')
+        plt.axis([0, self._occupancy_grid.shape[0], 0, self._occupancy_grid.shape[1]])
+        plt.show()
