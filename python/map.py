@@ -1,7 +1,9 @@
 __author__ = 'mbarnes1'
+#from numpy.random import choice
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import sys
 
 
 class Map(object):
@@ -19,26 +21,36 @@ class Map(object):
         """
         # Initialize the map, given the relative path to the map file
         self._occupancy_grid = np.genfromtxt(relative_path_to_map, skip_header=7)
-        #self._occupancy_grid = np.rot90(self._occupancy_grid)
         self._occupancy_grid[self._occupancy_grid == -1] = 0
         self._resolution = 10  # 10cm resolution
+        self._occupancy_vector = self._occupancy_grid.ravel()
+        self._normalized_occupancy_vector = self._occupancy_vector/sum(self._occupancy_vector)
         #self.max_x = self._occupancy_grid.size[0]*self._resolution
         #self.max_y = self._occupancy_grid.size[1]*self._resolution
 
     def query(self, x, y):
         """
-        Query a location.
-        x is the horizontal axis
-        y is the vertical axis
-        origin is bottom left hand corner. Quadrant 1 is upper left hand corner
+        Query an occupancy location in the map
         """
         # Return occupancy of the (x, y) map location
         ind_x = round(x/self._resolution)
         ind_y = round(y/self._resolution)
         return self._occupancy_grid[ind_x, ind_y]
 
-    def display(self):
+    def sample(self):
+        """
+        Samples a single point from the map based on occupancy probabilities
+        :return:
+        x, y
+        """
+        print np.version.version
+        print sys.path
+        vector_index = np.random.choice(range(0, len(self._occupancy_vector)), p=self._normalized_occupancy_vector,
+                                        replace=True)
+        array_index = np.unravel_index(vector_index, self._occupancy_grid.size())
+        return array_index[0], array_index[1]
+
+    def display(self, particles):
         plt.imshow(self._occupancy_grid, cmap=cm.Greys_r)
-        plt.xlabel('Y')
-        plt.ylabel('X')
-        plt.show()
+        for particle in particles:
+            plt.plot(particle.x, particle.y)
