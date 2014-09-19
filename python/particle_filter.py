@@ -18,6 +18,7 @@ class ParticleFilter(object):
             self.particles.append(Particle(self.map))
         self._motion_model = MotionModel()
         self._sensor_model = SensorModel(self.map)
+        self.map.display(self.particles)
 
     def display(self):
         self.map.display(self.particles)
@@ -37,10 +38,13 @@ class ParticleFilter(object):
         for particle in self.particles:
             self._motion_model.update(particle, x, y, theta, time_stamp)
         if measurement_type == "L":
-            ranges = measurements[3:-1]  # exclude last variable, the time stamp
+            x_laser = measurements[3]  # coordinates of the laser in standard odometry frame
+            y_laser = measurements[4]  # coordiantes of the laser in standard odometry frame
+            theta_laser = measurements[5]  # coordiantes of the laser in standard odometry frame
+            ranges = measurements[6:-1]  # exclude last variable, the time stamp
             particle_probabilities = list()  # unnormalized sensor model probabilities of the particles
             for particle in self.particles:
-                particle_probabilities.append(self._sensor_model.get_probability(particle, ranges))
+                particle_probabilities.append(self._sensor_model.get_probability(particle, x_laser, y_laser, theta_laser, ranges))
             self._resample(particle_probabilities)
 
     def _resample(self, particle_probabilities):
