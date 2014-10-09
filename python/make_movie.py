@@ -26,7 +26,7 @@ with writer.saving(fig, "writer_test.mp4", 100):  #num_lines):
         xy = line.split(';')
         for loc in xy:
             _x, _y = loc.split(',')
-            x.append(float(_y))
-            y.append(float(_x))
+            x.append(float(_x)/map_object._resolution)
+            y.append(float(_y)/map_object._resolution)
         p.set_data(x, y)
         writer.grab_frame()

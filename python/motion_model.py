@@ -46,7 +46,7 @@ class MotionModel(object):
         :param x_t0: State at time t-1. Of form [x y theta]
         :return x_t1: Sample drawn from motion model. Of form [x' y' theta']
         """
-        delta_rot_1 = math.atan2(u_t[1][1] - u_t[0][1], u_t[1][0] - u_t[0][0])
+        delta_rot_1 = math.atan2(u_t[1][1] - u_t[0][1], u_t[1][0] - u_t[0][0]) - u_t[0][2]
         delta_trans = math.sqrt((u_t[0][0] - u_t[1][0])**2 + (u_t[0][1] - u_t[1][1])**2)
         delta_rot_2 = u_t[1][2] - u_t[0][2] - delta_rot_1
 
@@ -57,7 +57,6 @@ class MotionModel(object):
         rand1 = np.random.normal(0, math.sqrt(var1)) if var1 else 0
         rand2 = np.random.normal(0, math.sqrt(var2)) if var2 else 0
         rand3 = np.random.normal(0, math.sqrt(var3)) if var3 else 0
-
 
         delta_rot_1_hat = delta_rot_1 - rand1
         delta_trans_hat = delta_trans - rand2
